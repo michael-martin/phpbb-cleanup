@@ -1,19 +1,6 @@
 require("dotenv").config();
 const puppeteer = require("puppeteer");
-
-const SELECTOR_LOGIN_NAME = 'input[name="username"]';
-const SELECTOR_LOGIN_PASSWORD = 'input[type="password"]';
-const SELECTOR_LOGIN_SUBMIT = '#login input[type="submit"]';
-
-const SELECTOR_ACP_NAME = 'input[name="username"]';
-const SELECTOR_ACP_PASSWORD = 'input[type="password"]';
-const SELECTOR_ACP_SUBMIT = '#login input[type="submit"]';
-
-const SELECTOR_JOINED_BEFORE = "#joined_before";
-const SELECTOR_POST_COUNT = "#count";
-const SELECTOR_DELETE_POSTS = 'input[name="deleteposts"][value="1"]';
-const SELECTOR_DELETE_USERS = 'input[name="action"][value="delete"]';
-const SELECTOR_PRUNE_SUBMIT = '#acp_prune input[type="submit"]';
+const SELECTORS = require("./selectors");
 
 (async () => {
   const browser = await puppeteer.launch({ headless: false });
@@ -49,13 +36,13 @@ const SELECTOR_PRUNE_SUBMIT = '#acp_prune input[type="submit"]';
 async function login(page) {
   await page.goto(`${process.env.FORUM_URL}/ucp.php?mode=login`);
 
-  await page.click(SELECTOR_LOGIN_NAME);
+  await page.click(SELECTORS.LOGIN_NAME);
   await page.keyboard.type(process.env.USERNAME);
 
-  await page.click(SELECTOR_LOGIN_PASSWORD);
+  await page.click(SELECTORS.LOGIN_PASSWORD);
   await page.keyboard.type(process.env.PASSWORD);
 
-  await page.click(SELECTOR_LOGIN_SUBMIT);
+  await page.click(SELECTORS.LOGIN_SUBMIT);
   return await page.waitForNavigation();
 }
 
@@ -68,10 +55,10 @@ async function login(page) {
 async function loginToAdmin(page, sid) {
   await page.goto(`${process.env.FORUM_URL}/adm/index.php?sid=${sid}`);
 
-  await page.click(SELECTOR_ACP_PASSWORD);
+  await page.click(SELECTORS.ACP_PASSWORD);
   await page.keyboard.type(process.env.PASSWORD);
 
-  await page.click(SELECTOR_ACP_SUBMIT);
+  await page.click(SELECTORS.ACP_SUBMIT);
   return await page.waitForNavigation();
 }
 
@@ -98,16 +85,16 @@ async function pruneUsers(page, sid, date) {
     `${process.env.FORUM_URL}/adm/index.php?sid=${sid}&i=acp_prune&mode=users`
   );
 
-  await page.click(SELECTOR_JOINED_BEFORE);
+  await page.click(SELECTORS.JOINED_BEFORE);
   await page.keyboard.type("2009-03-02");
 
-  await page.click(SELECTOR_POST_COUNT);
+  await page.click(SELECTORS.POST_COUNT);
   await page.keyboard.type("0");
 
-  await page.click(SELECTOR_DELETE_POSTS);
-  await page.click(SELECTOR_DELETE_USERS);
+  await page.click(SELECTORS.DELETE_POSTS);
+  await page.click(SELECTORS.DELETE_USERS);
 
-  await page.click(SELECTOR_PRUNE_SUBMIT);
+  await page.click(SELECTORS.PRUNE_SUBMIT);
   return await page.waitForNavigation();
 }
 
