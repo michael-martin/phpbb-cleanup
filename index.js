@@ -132,9 +132,12 @@ async function pruneUsers(page, sid, date) {
   await page.click(SELECTORS.DELETE_USERS);
 
   await page.click(SELECTORS.PRUNE_SUBMIT);
-  return await page.waitForNavigation({
-    timeout: 0
+  await page.waitForNavigation({
+    timeout: 300000
   });
+
+  const toDelete = await page.$$('input[name="user_ids[]"]');
+  console.log(`Deleting ${toDelete.length} users`);
 }
 
 /**
