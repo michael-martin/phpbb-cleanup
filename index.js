@@ -8,6 +8,7 @@ const format = require("date-fns/format");
 const addDays = require("date-fns/add_days");
 
 const dateFormat = "YYYY-MM-DD";
+const maxRetries = 3;
 
 (async () => {
   const browser = await puppeteer.launch({ headless: false });
@@ -103,14 +104,23 @@ async function loopPruneUsers(page, sid, startDate, endDate) {
   console.log(`Ready to prune users.`);
   console.log(`Joined from: ${startDate}`);
   console.log(`Joined to: ${endDate}`);
+  console.log("----------");
 
   let currentDate = startDate;
   let totalDeleted = 0;
+  let retryCounter = 0; // Prevent infinite retry loops.
 
-  while (isBefore(currentDate, endDate)) {
-    let deleted = await pruneUsers(page, sid, currentDate);
-    totalDeleted += deleted;
-    currentDate = addDays(currentDate, 1);
+  while (isBefore(currentDate, endDate) && retryCounter < maxRetries) {
+    try {
+      let deleted = await pruneUsers(page, sid, currentDate);
+      totalDeleted += deleted;
+      currentDate = addDays(currentDate, 1);
+      retryCounter = 0; // Reset counter on success.
+    } catch (e) {
+      console.log(e);
+      console.log(`Prune failed. Re-trying for ${currentDate}`);
+      retryCounter++;
+    }
   }
 
   return totalDeleted;
@@ -147,10 +157,6 @@ async function pruneUsers(page, sid, date) {
     timeout: 300000
   });
 
-  // Browser seems to take time to draw the full list of options sometimes, and waitForSelector doesn't resolve them.
-  // Timer is a hacky workaround.
-  await new Promise(resolve => setTimeout(resolve, 4000));
-
   // If no users matched the query, there is nothing to do.
   const error = await page.$(".errorbox");
   if (error) {
@@ -164,10 +170,15 @@ async function pruneUsers(page, sid, date) {
   console.log(`Deleting ${toDelete.length} users`);
 
   // Confirm.
-  await page.click(SELECTORS.PRUNE_CONFIRM_SUBMIT);
-  await page.waitForNavigation({
-    timeout: 300000
-  });
+  try {
+    await page.waitForSelector(SELECTORS.PRUNE_CONFIRM_FORM);
+    await page.$eval(SELECTORS.PRUNE_CONFIRM_FORM, form => form.submit());
+    await page.waitForNavigation({
+      timeout: 300000
+    });
+  } catch (e) {
+    throw "Failed to submit deletion form.";
+  }
 
   return toDelete.length;
 }
