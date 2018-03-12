@@ -158,15 +158,15 @@ async function pruneUsers(page, sid, date) {
   });
 
   // If no users matched the query, there is nothing to do.
-  const error = await page.$(".errorbox");
+  const error = await page.$(SELECTORS.ERROR_BOX);
   if (error) {
     console.log("No users to delete.");
     return 0;
   }
 
   // Log how many users will be deleted.
-  await page.waitForSelector('input[name="user_ids[]"]');
-  const toDelete = await page.$$('input[name="user_ids[]"]');
+  await page.waitForSelector(SELECTORS.PRUNE_USER_RESULTS);
+  const toDelete = await page.$$(SELECTORS.PRUNE_USER_RESULTS);
   console.log(`Deleting ${toDelete.length} users`);
 
   // Confirm.

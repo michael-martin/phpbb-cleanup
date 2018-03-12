@@ -11,6 +11,10 @@ const SELECTORS = {
   POST_COUNT: "#count",
   DELETE_POSTS: 'input[name="deleteposts"][value="1"]',
   DELETE_USERS: 'input[name="action"][value="delete"]',
+
+  ERROR_BOX: ".errorbox",
+
+  PRUNE_USER_RESULTS: 'input[name="user_ids[]"]',
   PRUNE_SUBMIT: '#acp_prune input[type="submit"][name="update"]',
   PRUNE_CONFIRM_SUBMIT: '#confirm input[type="submit"][name="confirm"]',
   PRUNE_CONFIRM_FORM: "#confirm"
