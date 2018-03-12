@@ -16,8 +16,7 @@ const SELECTORS = {
 
   PRUNE_USER_RESULTS: 'input[name="user_ids[]"]',
   PRUNE_SUBMIT: '#acp_prune input[type="submit"][name="update"]',
-  PRUNE_CONFIRM_SUBMIT: '#confirm input[type="submit"][name="confirm"]',
-  PRUNE_CONFIRM_FORM: "#confirm"
+  PRUNE_CONFIRM_SUBMIT: '#confirm input[type="submit"][name="confirm"]'
 };
 
 module.exports = SELECTORS;

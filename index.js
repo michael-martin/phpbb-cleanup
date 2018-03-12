@@ -9,6 +9,7 @@ const addDays = require("date-fns/add_days");
 
 const dateFormat = "YYYY-MM-DD";
 const maxRetries = 3;
+const navigationTimeout = 180000; // ms
 
 (async () => {
   const browser = await puppeteer.launch({ headless: false });
@@ -154,7 +155,7 @@ async function pruneUsers(page, sid, date) {
 
   await page.click(SELECTORS.PRUNE_SUBMIT);
   await page.waitForNavigation({
-    timeout: 300000
+    timeout: navigationTimeout
   });
 
   // If no users matched the query, there is nothing to do.
@@ -171,10 +172,11 @@ async function pruneUsers(page, sid, date) {
 
   // Confirm.
   try {
-    await page.waitForSelector(SELECTORS.PRUNE_CONFIRM_FORM);
-    await page.$eval(SELECTORS.PRUNE_CONFIRM_FORM, form => form.submit());
+    await page.waitForSelector(SELECTORS.PRUNE_CONFIRM_SUBMIT);
+    await page.click(SELECTORS.PRUNE_CONFIRM_SUBMIT);
+
     await page.waitForNavigation({
-      timeout: 300000
+      timeout: navigationTimeout
     });
   } catch (e) {
     throw "Failed to submit deletion form.";
