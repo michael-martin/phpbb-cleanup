@@ -59,8 +59,7 @@ async function login(page) {
   await page.click(SELECTORS.LOGIN_PASSWORD);
   await page.keyboard.type(process.env.PASSWORD);
 
-  await page.click(SELECTORS.LOGIN_SUBMIT);
-  return await page.waitForNavigation();
+  return await clickToSubmit(page, SELECTORS.LOGIN_SUBMIT);
 }
 
 /**
@@ -77,8 +76,7 @@ async function loginToAdmin(page, sid) {
   await page.click(SELECTORS.ACP_PASSWORD);
   await page.keyboard.type(process.env.PASSWORD);
 
-  await page.click(SELECTORS.ACP_SUBMIT);
-  return await page.waitForNavigation();
+  await clickToSubmit(page, SELECTORS.ACP_SUBMIT);
 }
 
 /**
@@ -153,14 +151,7 @@ async function pruneUsers(page, sid, date) {
   await page.click(SELECTORS.DELETE_POSTS);
   await page.click(SELECTORS.DELETE_USERS);
 
-  await page.click(SELECTORS.PRUNE_SUBMIT);
-  await page.waitForNavigation({
-    timeout: navigationTimeout
-  });
-
-  // Browser seems to take time to draw the full list of options sometimes, and waitForSelector doesn't resolve them.
-  // Timer is a quick hack to work around.
-  await new Promise(resolve => setTimeout(resolve, 4000));
+  await clickToSubmit(page, SELECTORS.PRUNE_SUBMIT);
 
   // If no users matched the query, there is nothing to do.
   const error = await page.$(SELECTORS.ERROR_BOX);
@@ -176,12 +167,7 @@ async function pruneUsers(page, sid, date) {
 
   // Confirm.
   try {
-    await page.waitForSelector(SELECTORS.PRUNE_CONFIRM_SUBMIT);
-    await page.click(SELECTORS.PRUNE_CONFIRM_SUBMIT);
-
-    await page.waitForNavigation({
-      timeout: navigationTimeout
-    });
+    await clickToSubmit(page, SELECTORS.PRUNE_CONFIRM_SUBMIT);
   } catch (e) {
     throw "Failed to submit deletion form.";
   }
@@ -209,4 +195,20 @@ async function getQueryParam(page, name) {
     },
     name
   );
+}
+
+/**
+ * Click to submit a form and wait for navigation to succeed.
+ *
+ * @param {*} page Puppeteer object.
+ * @param {string} selector     Selector for the button to clicl.
+ */
+async function clickToSubmit(page, selector) {
+  await page.waitForSelector(selector);
+  return await Promise.all([
+    page.waitForNavigation({
+      timeout: navigationTimeout
+    }),
+    page.click(selector)
+  ]);
 }
