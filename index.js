@@ -158,6 +158,10 @@ async function pruneUsers(page, sid, date) {
     timeout: navigationTimeout
   });
 
+  // Browser seems to take time to draw the full list of options sometimes, and waitForSelector doesn't resolve them.
+  // Timer is a quick hack to work around.
+  await new Promise(resolve => setTimeout(resolve, 4000));
+
   // If no users matched the query, there is nothing to do.
   const error = await page.$(SELECTORS.ERROR_BOX);
   if (error) {
