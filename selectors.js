@@ -13,6 +13,7 @@ const SELECTORS = {
   DELETE_USERS: 'input[name="action"][value="delete"]',
 
   ERROR_BOX: ".errorbox",
+  SUCCESS_BOX: ".successbox",
 
   PRUNE_USER_RESULTS: 'input[name="user_ids[]"]',
   PRUNE_SUBMIT: '#acp_prune input[type="submit"][name="update"]',

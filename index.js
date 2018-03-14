@@ -113,8 +113,12 @@ async function loopPruneUsers(page, sid, startDate, endDate) {
     try {
       let deleted = await pruneUsers(page, sid, currentDate);
       totalDeleted += deleted;
-      currentDate = addDays(currentDate, 1);
       retryCounter = 0; // Reset counter on success.
+
+      // Did we delete all users for today? Or were we limited by the batch size? (i.e. call today again)
+      if (deleted !== process.env.MAX_SIMULTANEOUS_DELETIONS) {
+        currentDate = addDays(currentDate, 1);
+      }
     } catch (e) {
       console.log(e);
       console.log(`Prune failed. Re-trying for ${currentDate}`);
@@ -160,19 +164,37 @@ async function pruneUsers(page, sid, date) {
     return 0;
   }
 
-  // Log how many users will be deleted.
+  // How many users will be deleted?
   await page.waitForSelector(SELECTORS.PRUNE_USER_RESULTS);
-  const toDelete = await page.$$(SELECTORS.PRUNE_USER_RESULTS);
-  console.log(`Deleting ${toDelete.length} users`);
+  const usersToDelete = await page.$$(SELECTORS.PRUNE_USER_RESULTS);
+  let numberToDelete = usersToDelete.length;
+
+  // Are there more results than we can delete in 1 batch?
+  // If so, de-select any past the batch limit.
+  if (numberToDelete > process.env.MAX_SIMULTANEOUS_DELETIONS) {
+    for (
+      let i = process.env.MAX_SIMULTANEOUS_DELETIONS;
+      i < usersToDelete.length;
+      i++
+    ) {
+      await usersToDelete[i].click();
+    }
+    numberToDelete = process.env.MAX_SIMULTANEOUS_DELETIONS;
+  }
+  console.log(`Deleting ${numberToDelete} users`);
 
   // Confirm.
   try {
     await clickToSubmit(page, SELECTORS.PRUNE_CONFIRM_SUBMIT);
+    const success = await page.$(SELECTORS.SUCCESS_BOX);
+    if (!success) {
+      throw "Deletion failed.";
+    }
   } catch (e) {
     throw "Failed to submit deletion form.";
   }
 
-  return toDelete.length;
+  return numberToDelete;
 }
 
 /**
