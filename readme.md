@@ -21,7 +21,7 @@ This uses [Puppeteer](https://github.com/GoogleChrome/puppeteer) to control Goog
 * Clone the repo
 * `npm install`
 * Copy the `.env.sample` file to `.env`
-* Update any settings there as appopriate.
+* Update settings there as appropriate
 * `npm start`
 
 ## .env Config
