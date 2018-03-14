@@ -10,9 +10,14 @@ const addDays = require("date-fns/add_days");
 const dateFormat = "YYYY-MM-DD";
 const maxRetries = 3;
 const navigationTimeout = 180000; // ms
+const maxSimultaneousDeletions = parseInt(
+  process.env.MAX_SIMULTANEOUS_DELETIONS,
+  10
+);
+const headlessMode = process.env.HEADLESS_MODE === "true";
 
 (async () => {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: headlessMode });
   const page = await browser.newPage();
 
   await login(page);
@@ -116,7 +121,7 @@ async function loopPruneUsers(page, sid, startDate, endDate) {
       retryCounter = 0; // Reset counter on success.
 
       // Did we delete all users for today? Or were we limited by the batch size? (i.e. call today again)
-      if (deleted !== process.env.MAX_SIMULTANEOUS_DELETIONS) {
+      if (deleted !== maxSimultaneousDeletions) {
         currentDate = addDays(currentDate, 1);
       }
     } catch (e) {
@@ -150,7 +155,7 @@ async function pruneUsers(page, sid, date) {
   await page.keyboard.type(joinedBeforeValue);
 
   await page.click(SELECTORS.POST_COUNT);
-  await page.keyboard.type("0");
+  await page.keyboard.type(process.env.POST_COUNT);
 
   await page.click(SELECTORS.DELETE_POSTS);
   await page.click(SELECTORS.DELETE_USERS);
@@ -171,15 +176,11 @@ async function pruneUsers(page, sid, date) {
 
   // Are there more results than we can delete in 1 batch?
   // If so, de-select any past the batch limit.
-  if (numberToDelete > process.env.MAX_SIMULTANEOUS_DELETIONS) {
-    for (
-      let i = process.env.MAX_SIMULTANEOUS_DELETIONS;
-      i < usersToDelete.length;
-      i++
-    ) {
+  if (numberToDelete > maxSimultaneousDeletions) {
+    for (let i = maxSimultaneousDeletions; i < usersToDelete.length; i++) {
       await usersToDelete[i].click();
     }
-    numberToDelete = process.env.MAX_SIMULTANEOUS_DELETIONS;
+    numberToDelete = maxSimultaneousDeletions;
   }
   console.log(`Deleting ${numberToDelete} users`);
 
