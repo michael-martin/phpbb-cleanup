@@ -18,6 +18,8 @@ This uses [Puppeteer](https://github.com/GoogleChrome/puppeteer) to control Goog
 
 ## How to use?
 
+Important - Backup your forum first. This script deliberately deletes data, so you definitely want a backup!
+
 * Clone the repo
 * `npm install`
 * Copy the `.env.sample` file to `.env`
