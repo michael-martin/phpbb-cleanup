@@ -26,19 +26,23 @@ This uses [Puppeteer](https://github.com/GoogleChrome/puppeteer) to control Goog
 
 ## .env Config
 
-| Property                   |                                  Use                                  |                        Example |
-| -------------------------- | :-------------------------------------------------------------------: | -----------------------------: |
-| FORUM_URL                  |                 Public board URL, no trailing slash.                  | https://forum.fangathering.com |
-| USERNAME                   |                            Admin username                             |                       MichaelM |
-| PASSWORD                   |                            Admin password                             |                       p@$$w0rd |
-| JOINED_BEFORE_START        |   When to start processing from (roughly when your board started?)    |                     2011-01-14 |
-| JOINED_BEFORE_END          | When to prune users up until (roughly a month or two ago for safety?) |                     2011-03-01 |
-| POST_COUNT                 |            Only delete users who have made this many posts            |                              0 |
-| MAX_SIMULTANEOUS_DELETIONS |           Batch size. Lower this number if you hit errors.            |                            250 |
-| HEADLESS_MODE              |       Set to false if you want to see the Chrome window running       |                           true |
+| Property                   |                                  Use                                  |                Example |
+| -------------------------- | :-------------------------------------------------------------------: | ---------------------: |
+| FORUM_URL                  |                 Public board URL, no trailing slash.                  | https://site.com/forum |
+| USERNAME                   |                            Admin username                             |               MichaelM |
+| PASSWORD                   |                            Admin password                             |               p@$$w0rd |
+| JOINED_BEFORE_START        |   When to start processing from (roughly when your board started?)    |             2011-01-14 |
+| JOINED_BEFORE_END          | When to prune users up until (roughly a month or two ago for safety?) |             2011-03-01 |
+| POST_COUNT                 |            Only delete users who have made this many posts            |                      0 |
+| MAX_SIMULTANEOUS_DELETIONS |           Batch size. Lower this number if you hit errors.            |                    250 |
+| HEADLESS_MODE              |       Set to false if you want to see the Chrome window running       |                   true |
 
 ## Can I use other prune parameters?
 
 Sure, I've just added the ones I needed here.
 
 Look in `index.js` for the `pruneUsers()` function. You'll see a few lines in where we fill in the form and how easy Puppeteer makes this. Feel free to adjust to suit your board!
+
+## Sample Output
+
+![alt text](https://raw.githubusercontent.com/michael-martin/phpbb-cleanup/master/sample-run.jpg "Sample run")
