@@ -203,9 +203,18 @@ async function pruneUsers(page, sid, joinedBefore, username) {
   const usersToDelete = await page.$$(SELECTORS.PRUNE_USER_RESULTS);
   let numberToDelete = usersToDelete.length;
 
+  // Are there so many that we'd rather split by letter?
+  if (!username && numberToDelete > 1500) {
+    throw `Deliberately choose to split by letter instead. Total: ${numberToDelete}`;
+  }
+
   // Are there more results than we can delete in 1 batch?
   // If so, de-select any past the batch limit.
   if (numberToDelete > maxSimultaneousDeletions) {
+    console.log(
+      `Too many results, de-selecting extras: ${numberToDelete -
+        maxSimultaneousDeletions}`
+    );
     for (let i = maxSimultaneousDeletions; i < usersToDelete.length; i++) {
       await usersToDelete[i].click();
     }
