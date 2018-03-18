@@ -9,6 +9,8 @@ const SELECTORS = {
 
   JOINED_BEFORE: "#joined_before",
   POST_COUNT: "#count",
+  LAST_ACTIVE: "#active",
+  USERNAME: "#username",
   DELETE_POSTS: 'input[name="deleteposts"][value="1"]',
   DELETE_USERS: 'input[name="action"][value="delete"]',
 

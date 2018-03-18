@@ -14,6 +14,7 @@ This uses [Puppeteer](https://github.com/GoogleChrome/puppeteer) to control Goog
 * Loads the Prune Users page in the ACP.
 * Searches for users 1 day at a time.
 * If too many results come back, selects to delete only the first batch (defaults 250).
+* If this is still too many, uses "username" with wildcard to split these up by starting letter.
 * Repeats
 
 ## How to use?
@@ -28,16 +29,17 @@ Important - Backup your forum first. This script deliberately deletes data, so y
 
 ## .env Config
 
-| Property                   |                                  Use                                  |                Example |
-| -------------------------- | :-------------------------------------------------------------------: | ---------------------: |
-| FORUM_URL                  |                 Public board URL, no trailing slash.                  | https://site.com/forum |
-| USERNAME                   |                            Admin username                             |               MichaelM |
-| PASSWORD                   |                            Admin password                             |               p@$$w0rd |
-| JOINED_BEFORE_START        |   When to start processing from (roughly when your board started?)    |             2011-01-14 |
-| JOINED_BEFORE_END          | When to prune users up until (roughly a month or two ago for safety?) |             2011-03-01 |
-| POST_COUNT                 |            Only delete users who have made this many posts            |                      0 |
-| MAX_SIMULTANEOUS_DELETIONS |           Batch size. Lower this number if you hit errors.            |                    250 |
-| HEADLESS_MODE              |       Set to false if you want to see the Chrome window running       |                   true |
+| Property                   |                                         Use                                          |                Example |
+| -------------------------- | :----------------------------------------------------------------------------------: | ---------------------: |
+| FORUM_URL                  |                         Public board URL, no trailing slash.                         | https://site.com/forum |
+| USERNAME                   |                                    Admin username                                    |               MichaelM |
+| PASSWORD                   |                                    Admin password                                    |               p@$$w0rd |
+| JOINED_BEFORE_START        |           When to start processing from (roughly when your board started?)           |             2011-01-14 |
+| JOINED_BEFORE_END          |        When to prune users up until (roughly a month or two ago for safety?)         |             2011-03-01 |
+| POST_COUNT                 |                   Only delete users who have made this many posts                    |                      0 |
+| MAX_SIMULTANEOUS_DELETIONS |                   Batch size. Lower this number if you hit errors.                   |                    250 |
+| HEADLESS_MODE              |              Set to false if you want to see the Chrome window running               |                   true |
+| NAVIGATION_TIMEOUT_MS      | Time to wait for a page to load? No point setting higher than server script timeout. |                 120000 |
 
 ## Can I use other prune parameters?
 
